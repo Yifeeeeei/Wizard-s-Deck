@@ -5,12 +5,21 @@ import textwrap
 import os
 
 
+"""
+配置文件
+"""
+
+
 class Config:
     def __init__(self) -> None:
-        self.width = 250
-        self.width = 400
-        self.icon_path = ""
-        self.drawing_path = ""
+        self.card_width = 590
+        self.card_height = 860
+        self.drawing_width = 510
+        self.drawing_height = 510
+        self.drawing_to_upper = 40
+        self.general_path = ""  # 通用素材
+        self.drawing_path = ""  # 卡牌原画
+        self.font_path = ""  # 字体
 
 
 """
@@ -50,13 +59,39 @@ class CardInfo:
         # 以下是道具卡的独有属性
 
 
+"""
+卡牌制作类
+"""
+
+
 class CardMaker:
     def __init__(self, config: Config) -> None:
         self.config = config
 
-    def adjust_image(self, image):
+    def translator(self, chi):
+        if chi == "光":
+            return "light"
+        elif chi == "暗":
+            return "dark"
+        elif chi == "火":
+            return "fire"
+        elif chi == "水":
+            return "water"
+        elif chi == "风":
+            return "wind"
+        elif chi == "地":
+            return "earth"
+        elif chi == "?":
+            return "none"
+        else:
+            print("invalid chi encounterd: " + chi)
+            return None
+
+    def adjust_image(self, image, target_weight_and_height):
         width, height = image.size
-        card_width, card_height = self.config.width, self.config.height
+        card_width, card_height = target_weight_and_height
+        if width == card_width and height == card_height:
+            return image
         if width >= card_width and height >= card_height:
             left = (width - card_width) / 2
             top = (height - card_height) / 2
@@ -74,15 +109,41 @@ class CardMaker:
                 os.path.join(self.config.drawing_path, card_info.name + ext)
             ):
                 raw_img = PIL.Image.open(
-                    os.path.join(self.config.drawing_path, card_info.name + ".jpg")
+                    os.path.join(self.config.drawing_path, card_info.name + ext)
+                )
+                return self.adjust_image(
+                    raw_img, (self.config.drawing_width, self.config.drawing_height)
                 )
 
         print("could not find drawing for card: " + card_info.name)
         return None
 
+    def get_background(self, card_info: CardInfo):
+        bg_image = PIL.Image.open(
+            os.path.join(
+                self.config.general_path,
+                "back_" + self.translator(card_info.category) + ".png",
+            )
+        ).convert("RGBA")
+        return self.adjust_image(
+            bg_image, (self.config.card_width, self.config.card_height)
+        )
+
     # 准备好底板，除了描述和血量，元素消耗之类的其他东西，包括原画
     def prepare_outline(self, card_info: CardInfo):
-        pass
+        base_image = self.get_background(card_info)
+        drawing_image = self.get_drawing(card_info)
+        base_image.paste(
+            drawing_image,
+            (
+                int((self.config.card_width - self.config.drawing_width) / 2),
+                self.config.drawing_to_upper,
+            ),
+        )
+
+        # 添加边框
+
+        return base_image
 
     def make_unit_card(self, card_info: CardInfo):
         pass
