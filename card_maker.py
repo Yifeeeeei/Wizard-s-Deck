@@ -87,9 +87,22 @@ class CardMaker:
             print("invalid chi encounterd: " + chi)
             return None
 
-    def adjust_image(self, image, target_weight_and_height):
+    def adjust_image(self, image, target_width_and_height):
         width, height = image.size
-        card_width, card_height = target_weight_and_height
+        target_width, target_height = target_width_and_height
+        if width / height > target_width / target_width:
+            ideal_width = target_width / target_width * height
+            left = (width - ideal_width) / 2
+            right = (width + ideal_width) / 2
+            image = image.crop((left, 0, right, height))
+        if width / height < target_width / target_width:
+            ideal_width = target_width / target_width * height
+            top = (height - ideal_width) / 2
+            bottom = (height + ideal_width) / 2
+            image = image.crop((0, top, width, bottom))
+        image = image.resize((target_width, target_height))
+        return image
+
         if width == card_width and height == card_height:
             return image
         if width >= card_width and height >= card_height:
