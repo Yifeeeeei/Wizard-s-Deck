@@ -65,6 +65,6 @@ cm = CardMaker(config)
 
 ci = CardInfo()
 ci.category = "水"
-ci.name = "test"
-card_image = cm.prepare_outline(ci)
+ci.name = "超级水货"
+card_image = cm.make_unit_card(ci)
 card_image.save("ci.png")
