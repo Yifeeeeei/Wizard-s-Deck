@@ -15,13 +15,25 @@ from config import Config
 class Elements:
     def __init__(self, elements_dict) -> None:
         self.elements_dict = elements_dict
-        all_elements = ["光", "暗", "火", "水", "地", "?"]
+        all_elements = ["光", "暗", "火", "水", "地", "风", "?"]
         for ele in all_elements:
             if ele not in elements_dict:
                 elements_dict[ele] = 0
 
     def total_cost(self):
         return sum(self.elements_dict.values())
+
+    def __getitem__(self, item):
+        return self.elements_dict[item]
+
+    def __setitem__(self, key, value):
+        self.elements_dict[key] = value
+
+    def keys(self):
+        return self.elements_dict.keys()
+
+    def values(self):
+        return self.elements_dict.values()
 
 
 class CardInfo:
@@ -32,6 +44,7 @@ class CardInfo:
 
         self.explanation = ""  # 说明，传奇异兽、道具、咒术、法术之类的名词
         self.description = ""  # 描述
+        self.quote = ""  # 一段帅气的文字引用
         self.elements_cost = Elements({})  # 左上角元素消耗
         self.elements_gain = Elements({})  # 右下角元素负载
         # 以下是生物卡的独有属性
@@ -172,9 +185,9 @@ class CardMaker:
 
         return base_image
 
-    def estimate_text_size(self, text, font_size):
-        text = str(text)
-        return font_size * len(text)
+    def estimate_text_size(self, text, font):
+        length = font.getsize(text)[0]
+        return length
 
     def draw_round_corner_rectangle(
         self, image, left_top_right_bottom, radius, color, outline=None, width=1
@@ -209,18 +222,25 @@ class CardMaker:
         draw.text(left_top, text, font=font, fill=color)
         return image
 
-    def get_category_image(self, card_info: CardInfo):
+    # def get_category_image(self, card_info: CardInfo):
+    #     return self.get_image_without_extension(
+    #         os.path.join(
+    #             self.config.general_path, "ele_" + self.translator(card_info.category)
+    #         )
+    #     )
+
+    def get_category_image(self, category: str):
         return self.get_image_without_extension(
-            os.path.join(
-                self.config.general_path, "ele_" + self.translator(card_info.category)
-            )
+            os.path.join(self.config.general_path, "ele_" + self.translator(category))
         )
 
     def draw_category_and_name(self, card_info: CardInfo, base_image: PIL.Image):
         # add name
-        length_estimate = self.estimate_text_size(
-            card_info.name, self.config.name_font_size
+        text_font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.name_font),
+            self.config.name_font_size,
         )
+        length_estimate = self.estimate_text_size(card_info.name, text_font)
         rectangle_width = length_estimate + 2 * (
             self.config.name_text_to_left - self.config.name_rect_left
         )
@@ -237,14 +257,11 @@ class CardMaker:
             self.config.name_rect_outline_width,
         )
         text_left = self.config.name_text_to_left
+        text_height = text_font.getsize(card_info.name)[1]
         text_top = (
-            self.config.name_rect_top
-            + (self.config.name_rect_height - self.config.name_font_size) / 2
+            self.config.name_rect_top + (self.config.name_rect_height - text_height) / 2
         )
-        text_font = PIL.ImageFont.truetype(
-            os.path.join(self.config.font_path, self.config.name_font),
-            self.config.name_font_size,
-        )
+
         base_image = self.add_text_on_image(
             base_image,
             card_info.name,
@@ -255,7 +272,7 @@ class CardMaker:
 
         # add category
 
-        category_image = self.get_category_image(card_info)
+        category_image = self.get_category_image(card_info.category)
         category_image = self.adjust_image(
             category_image,
             (
@@ -271,11 +288,188 @@ class CardMaker:
 
         return base_image
 
+    def draw_cost(self, card_info: CardInfo, base_image: PIL.Image):
+        # estimate the length
+        all_costs = []
+        for ele in card_info.elements_cost.keys():
+            if card_info.elements_cost[ele] > 0:
+                all_costs.append((ele, card_info.elements_cost[ele]))
+        # nothing to do here
+        if len(all_costs) == 0:
+            return base_image
+
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.cost_font),
+            self.config.cost_font_size,
+        )
+
+        number_length = 0
+        for tup in all_costs:
+            number_length += font.getsize(str(tup[1]))[0]
+        category_length = len(all_costs) * self.config.cost_category_width
+        total_length = (
+            number_length
+            + category_length
+            + len(all_costs) * self.config.cost_padding * 2
+            + self.config.cost_padding
+        )
+        # draw the rectangle
+        rect_top = self.config.cost_rect_top
+        rect_left = self.config.cost_rect_left
+        rect_right = rect_left + total_length
+        rect_bottom = rect_top + self.config.cost_rect_height
+        base_image = self.draw_round_corner_rectangle(
+            base_image,
+            (rect_left, rect_top, rect_right, rect_bottom),
+            self.config.cost_rect_radius,
+            self.config.cost_rect_fill,
+            self.config.cost_rect_outline_color,
+            self.config.cost_rect_outline_width,
+        )
+        # put in the numbers and categories
+        left_pointer = rect_left + self.config.cost_padding
+        text_height = font.getsize("1")[1]
+        text_top = int(
+            rect_top
+            + (self.config.cost_rect_height - text_height) / 2
+            - self.config.cost_font_compensation
+        )
+        category_top = int(
+            rect_top
+            + (self.config.cost_rect_height - self.config.cost_category_width) / 2
+        )
+        # sort all costs, put the corresponding element to the head
+        for tup in all_costs:
+            if tup[0] == card_info.category:
+                all_costs.remove(tup)
+                all_costs.insert(0, tup)
+                break
+        # draw the elements
+        for tup in all_costs:
+            # draw the number
+            base_image = self.add_text_on_image(
+                base_image,
+                str(tup[1]),
+                (left_pointer, text_top),
+                font,
+                self.config.cost_font_color,
+            )
+            left_pointer += font.getsize(str(tup[1]))[0] + self.config.cost_padding
+
+            # draw the category
+            category_image = self.get_category_image(tup[0])
+            category_image = self.adjust_image(
+                category_image,
+                (
+                    self.config.cost_category_width,
+                    self.config.cost_category_width,
+                ),
+            )
+            base_image.paste(
+                category_image,
+                (left_pointer, category_top),
+                mask=category_image,
+            )
+            left_pointer += self.config.cost_category_width + self.config.cost_padding
+
+        return base_image
+
+    def draw_explanation(self, card_info: CardInfo, base_image: PIL.Image):
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.explanation_font),
+            self.config.explanation_font_size,
+        )
+        base_image = self.add_text_on_image(
+            base_image,
+            card_info.explanation,
+            (
+                self.config.explanation_text_left,
+                self.config.explanation_text_to_block_top
+                + self.config.drawing_to_upper
+                + self.config.drawing_height,
+            ),
+            font,
+            self.config.explanation_font_color,
+        )
+        return base_image
+
+    def draw_discription(self, card_info: CardInfo, base_image: PIL.Image):
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.discription_font),
+            self.config.explanation_font_size,
+        )
+        textwrap_width_pixel = (
+            self.config.card_width - self.config.discription_text_left * 2
+        )
+
+        textwrap_width = int(textwrap_width_pixel / font.getsize("标")[0])
+        wrapped_text = textwrap.wrap(card_info.description, width=textwrap_width)
+        text_height = font.getsize("标")[1]
+        top_pointer = (
+            self.config.discription_text_to_block_top
+            + self.config.drawing_to_upper
+            + self.config.drawing_height
+        )
+
+        for line in wrapped_text:
+            base_image = self.add_text_on_image(
+                base_image,
+                line,
+                (
+                    self.config.discription_text_left,
+                    top_pointer,
+                ),
+                font,
+                self.config.discription_font_color,
+            )
+            top_pointer += self.config.discription_line_spacing + text_height
+        return base_image
+
+    def draw_quote(self, card_info: CardInfo, base_image: PIL.Image):
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.quote_font),
+            self.config.quote_font_size,
+        )
+        textwrap_width_pixel = self.config.card_width - self.config.quote_text_left * 2
+
+        textwrap_width = int(textwrap_width_pixel / font.getsize("标")[0])
+        wrapped_text = textwrap.wrap(card_info.quote, width=textwrap_width)
+        text_height = font.getsize("标")[1]
+        bottom_pointer = (
+            self.config.bottom_block_height
+            + self.config.drawing_to_upper
+            + self.config.drawing_height
+            - self.config.quote_text_to_block_bottom
+            - text_height
+        )
+
+        for line in reversed(wrapped_text):
+            base_image = self.add_text_on_image(
+                base_image,
+                line,
+                (
+                    self.config.quote_text_left,
+                    bottom_pointer,
+                ),
+                font,
+                self.config.quote_font_color,
+            )
+            bottom_pointer -= self.config.quote_line_spacing + text_height
+        return base_image
+
     def make_unit_card(self, card_info: CardInfo):
         # 准备底层
         base_image = self.prepare_outline(card_info)
         # 准备左上角元素+名称
         base_image = self.draw_category_and_name(card_info, base_image)
+        # 准备费用
+        base_image = self.draw_cost(card_info, base_image)
+        # 准备解释
+        base_image = self.draw_explanation(card_info, base_image)
+        # 准备卡牌描述
+        base_image = self.draw_discription(card_info, base_image)
+        # 准备引言
+        base_image = self.draw_quote(card_info, base_image)
         return base_image
 
     def make_ability_card(self, card_info: CardInfo):
