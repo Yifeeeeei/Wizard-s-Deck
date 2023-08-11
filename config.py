@@ -33,8 +33,8 @@ class Config_default(Config):
         self.bottom_block_width = 540
         self.bottom_block_height = 260
         self.bottom_block_color = (255, 255, 255)
-        self.bottom_block_transparency = 180
-        self.bottom_block_legend_radius = 8
+        self.bottom_block_transparency = 150
+        self.bottom_block_legend_radius = 0
         # 左上元素+名称
         self.name_font_size = 40
         self.name_font = "MaShanZheng-Regular.ttf"
