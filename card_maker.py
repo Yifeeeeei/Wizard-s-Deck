@@ -81,7 +81,7 @@ class CardMaker:
             return "wind"
         elif chi == "地":
             return "earth"
-        elif chi == "?":
+        elif chi == "?" or chi == "无" or chi == "？":
             return "none"
         else:
             print("invalid chi encounterd: " + chi)

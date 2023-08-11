@@ -65,7 +65,7 @@ config.drawing_path = "resources/drawings"
 cm = CardMaker(config)
 
 ci = CardInfo()
-ci.category = "风"
+ci.category = "?"
 ci.type = "生物"
 ci.name = "超级水货"
 ci.tag = "传奇水货·大水货"
