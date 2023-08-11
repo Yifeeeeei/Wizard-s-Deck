@@ -51,6 +51,8 @@ class CardInfo:
 
         self.life = 0  # 生命值
 
+        self.version = ""  # 版本号
+
         # 以下是技能卡的独有属性
         self.cool_down = 0  # 冷却回合数
 
@@ -88,15 +90,17 @@ class CardMaker:
     def adjust_image(self, image, target_width_and_height):
         width, height = image.size
         target_width, target_height = target_width_and_height
-        if width / height > target_width / target_width:
-            ideal_width = target_width / target_width * height
+        if (width / height) > (target_width / target_height):
+            # too wide
+            ideal_width = target_width / target_height * height
             left = (width - ideal_width) / 2
             right = (width + ideal_width) / 2
             image = image.crop((left, 0, right, height))
-        if width / height < target_width / target_width:
-            ideal_width = target_width / target_width * height
-            top = (height - ideal_width) / 2
-            bottom = (height + ideal_width) / 2
+        if (width / height) < (target_width / target_height):
+            # too tall
+            ideal_height = target_height / target_width * width
+            top = (height - ideal_height) / 2
+            bottom = (height + ideal_height) / 2
             image = image.crop((0, top, width, bottom))
         image = image.resize((target_width, target_height))
         return image
@@ -134,56 +138,98 @@ class CardMaker:
         )
         return border_image
 
-    def draw_bottom_block(self, base_image):
-        new_image = PIL.Image.new("RGBA", base_image.size, (255, 255, 255, 0))
-        draw = PIL.ImageDraw.Draw(new_image)
-        top = self.config.drawing_to_upper + self.config.drawing_height
-        left = (self.config.card_width - self.config.bottom_block_width) / 2
-        bottom = (
-            self.config.drawing_to_upper
-            + self.config.drawing_height
-            + self.config.bottom_block_height
-        )
-        right = left + self.config.bottom_block_width
+    def draw_bottom_block(self, base_image, card_info: CardInfo):
+        if not self.is_legend(card_info):
+            new_image = PIL.Image.new("RGBA", base_image.size, (255, 255, 255, 0))
+            draw = PIL.ImageDraw.Draw(new_image)
+            top = self.config.drawing_to_upper + self.config.drawing_height
+            left = (self.config.card_width - self.config.bottom_block_width) / 2
+            bottom = (
+                self.config.drawing_to_upper
+                + self.config.drawing_height
+                + self.config.bottom_block_height
+            )
+            right = left + self.config.bottom_block_width
 
-        draw.rectangle(
-            ((left, top), (right, bottom)),
-            fill=self.config.bottom_block_color
-            + (self.config.bottom_block_transparency,),
-        )
-        out = PIL.Image.alpha_composite(base_image, new_image)
-        return out
+            draw.rectangle(
+                ((left, top), (right, bottom)),
+                fill=self.config.bottom_block_color
+                + (self.config.bottom_block_transparency,),
+            )
+            out = PIL.Image.alpha_composite(base_image, new_image)
+            return out
+        else:
+            new_image = PIL.Image.new("RGBA", base_image.size, (255, 255, 255, 0))
+            draw = PIL.ImageDraw.Draw(new_image)
+            top = self.config.drawing_to_upper + self.config.drawing_height
+            left = (self.config.card_width - self.config.bottom_block_width) / 2
+            bottom = (
+                self.config.drawing_to_upper
+                + self.config.drawing_height
+                + self.config.bottom_block_height
+            )
+            right = left + self.config.bottom_block_width
+
+            draw.rounded_rectangle(
+                ((left, top), (right, bottom)),
+                self.config.bottom_block_legend_radius,
+                fill=self.config.bottom_block_color
+                + (self.config.bottom_block_transparency,),
+            )
+            out = PIL.Image.alpha_composite(base_image, new_image)
+            return out
+
+    def is_legend(self, card_info: CardInfo):
+        if "传说" in card_info.explanation or "传奇" in card_info.explanation:
+            return True
+        return False
 
     # 准备好底板，除了描述和血量，元素消耗之类的其他东西，包括原画
     def prepare_outline(self, card_info: CardInfo):
-        # 添加背景
-        base_image = self.get_background(card_info)
-        # 添加卡牌原画
-        drawing_image = self.get_drawing(card_info)
-        # 添加原画
-        base_image.paste(
-            drawing_image,
-            (
-                int((self.config.card_width - self.config.drawing_width) / 2),
-                self.config.drawing_to_upper,
-            ),
-        )
-        # 添加底部文字背景
-        base_image = self.draw_bottom_block(base_image)
+        if not self.is_legend(card_info):
+            # 添加背景
+            base_image = self.get_background(card_info)
+            # 添加卡牌原画
+            drawing_image = self.get_drawing(card_info)
+            base_image = self.adjust_image(
+                base_image, (self.config.card_width, self.config.card_height)
+            )
+            drawing_image = self.adjust_image(
+                drawing_image, (self.config.drawing_width, self.config.drawing_height)
+            )
+            # 添加原画
+            base_image.paste(
+                drawing_image,
+                (
+                    int((self.config.card_width - self.config.drawing_width) / 2),
+                    self.config.drawing_to_upper,
+                ),
+            )
+            # 添加底部文字背景
+            base_image = self.draw_bottom_block(base_image, card_info)
 
-        # 获取边框
-        border_image = self.get_border()
-        # 添加边框
-        base_image.paste(
-            border_image,
-            (
-                int((self.config.card_width - self.config.border_width) / 2),
-                int((self.config.card_height - self.config.border_height) / 2),
-            ),
-            mask=border_image,
-        )
+            # 获取边框
+            border_image = self.get_border()
+            # 添加边框
+            base_image.paste(
+                border_image,
+                (
+                    int((self.config.card_width - self.config.border_width) / 2),
+                    int((self.config.card_height - self.config.border_height) / 2),
+                ),
+                mask=border_image,
+            )
 
-        return base_image
+            return base_image
+        else:
+            base_image = self.get_drawing(card_info)
+            # 添加卡牌原画
+            base_image = self.adjust_image(
+                base_image, (self.config.card_width, self.config.card_height)
+            )
+            base_image = self.draw_bottom_block(base_image, card_info)
+
+            return base_image
 
     def estimate_text_size(self, text, font):
         length = font.getsize(text)[0]
@@ -598,6 +644,7 @@ class CardMaker:
                 all_gains.remove(tup)
                 all_gains.insert(0, tup)
                 break
+        all_gains = reversed(all_gains)
         # draw the elements
         for tup in all_gains:
             # draw the category

@@ -65,10 +65,11 @@ config.drawing_path = "resources/drawings"
 cm = CardMaker(config)
 
 ci = CardInfo()
-ci.category = "水"
+ci.category = "?"
+ci.type = "生物"
 ci.name = "超级水货"
 ci.explanation = "传奇水货·大水货"
-ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒" * 5
+ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒" * 2
 ci.elements_cost["水"] = 2
 ci.elements_cost["光"] = 4
 ci.elements_cost["火"] = 1
@@ -78,6 +79,7 @@ ci.elements_gain["光"] = 4
 ci.elements_gain["火"] = 1
 ci.elements_gain["?"] = 1
 ci.life = 4
+ci.version = "1.0.0"
 ci.quote = "我是超级水货！哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"
 card_image = cm.make_unit_card(ci)
 card_image.save("ci.png")
