@@ -42,7 +42,7 @@ class CardInfo:
         self.name = ""
         self.category = ""  # 火水地光暗?
 
-        self.explanation = ""  # 说明，传奇异兽、道具、咒术、法术之类的名词
+        self.tag = ""  # 说明，传奇异兽、道具、咒术、法术之类的名词
         self.description = ""  # 描述
         self.quote = ""  # 一段帅气的文字引用
         self.elements_cost = Elements({})  # 左上角元素消耗
@@ -180,7 +180,7 @@ class CardMaker:
             return out
 
     def is_legend(self, card_info: CardInfo):
-        if "传说" in card_info.explanation or "传奇" in card_info.explanation:
+        if "传说" in card_info.tag or "传奇" in card_info.tag:
             return True
         return False
 
@@ -420,28 +420,28 @@ class CardMaker:
 
         return base_image
 
-    def draw_explanation(self, card_info: CardInfo, base_image: PIL.Image):
+    def draw_tag(self, card_info: CardInfo, base_image: PIL.Image):
         font = PIL.ImageFont.truetype(
-            os.path.join(self.config.font_path, self.config.explanation_font),
-            self.config.explanation_font_size,
+            os.path.join(self.config.font_path, self.config.tag_font),
+            self.config.tag_font_size,
         )
         base_image = self.add_text_on_image(
             base_image,
-            card_info.explanation,
+            card_info.tag,
             (
-                self.config.explanation_text_left,
-                self.config.explanation_text_to_block_top
+                self.config.tag_text_left,
+                self.config.tag_text_to_block_top
                 + self.config.drawing_to_upper
                 + self.config.drawing_height,
             ),
             font,
-            self.config.explanation_font_color,
+            self.config.tag_font_color,
         )
         return base_image
 
     def draw_discription_and_quote(self, card_info: CardInfo, base_image: PIL.Image):
         # dynamically adjust font size
-        discription_font_size = self.config.explanation_font_size
+        discription_font_size = self.config.tag_font_size
         quote_font_size = self.config.quote_font_size
         discription_line_spacing = self.config.discription_line_spacing
         quote_line_spacing = self.config.quote_line_spacing
@@ -741,8 +741,8 @@ class CardMaker:
         base_image = self.draw_category_and_name(card_info, base_image)
         # 准备费用
         base_image = self.draw_cost(card_info, base_image)
-        # 准备解释
-        base_image = self.draw_explanation(card_info, base_image)
+        # 准备标签
+        base_image = self.draw_tag(card_info, base_image)
         # 准备卡牌描述和引言
         base_image = self.draw_discription_and_quote(card_info, base_image)
         # 准备底部负载

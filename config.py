@@ -64,12 +64,12 @@ class Config_default(Config):
         self.cost_rect_fill = (255, 195, 0)
         self.cost_rect_outline_color = (255, 255, 255)
         self.cost_rect_outline_width = 3
-        # 解释
-        self.explanation_font = "FangZhengKaiTiJianTi-1.ttf"
-        self.explanation_font_size = 24
-        self.explanation_font_color = (0, 0, 0)
-        self.explanation_text_left = 50
-        self.explanation_text_to_block_top = 15
+        # 标签
+        self.tag_font = "FangZhengKaiTiJianTi-1.ttf"
+        self.tag_font_size = 24
+        self.tag_font_color = (0, 0, 0)
+        self.tag_text_left = 50
+        self.tag_text_to_block_top = 15
         # 卡牌描述
         self.discription_font = "FangZhengKaiTiJianTi-1.ttf"
         self.discription_font_size = 24
