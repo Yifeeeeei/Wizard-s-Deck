@@ -393,68 +393,298 @@ class CardMaker:
         )
         return base_image
 
-    def draw_discription(self, card_info: CardInfo, base_image: PIL.Image):
-        font = PIL.ImageFont.truetype(
+    def draw_discription_and_quote(self, card_info: CardInfo, base_image: PIL.Image):
+        # dynamically adjust font size
+        discription_font_size = self.config.explanation_font_size
+        quote_font_size = self.config.quote_font_size
+        discription_line_spacing = self.config.discription_line_spacing
+        quote_line_spacing = self.config.quote_line_spacing
+        discription_font = PIL.ImageFont.truetype(
             os.path.join(self.config.font_path, self.config.discription_font),
-            self.config.explanation_font_size,
-        )
-        textwrap_width_pixel = (
-            self.config.card_width - self.config.discription_text_left * 2
+            discription_font_size,
         )
 
-        textwrap_width = int(textwrap_width_pixel / font.getsize("标")[0])
-        wrapped_text = textwrap.wrap(card_info.description, width=textwrap_width)
-        text_height = font.getsize("标")[1]
-        top_pointer = (
+        quote_font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.quote_font),
+            quote_font_size,
+        )
+
+        estimated_total_height = 0
+
+        # estimate discription height
+
+        discription_textwrap_width_pixel = (
+            self.config.card_width - self.config.discription_text_left * 2
+        )
+        discription_textwrap_width = int(
+            discription_textwrap_width_pixel / discription_font.getsize("标")[0]
+        )
+        discription_wrapped_text = textwrap.wrap(
+            card_info.description, width=discription_textwrap_width
+        )
+        discription_text_height = discription_font.getsize("标")[1]
+        discription_height = discription_line_spacing + (
+            discription_text_height + discription_line_spacing
+        ) * len(discription_wrapped_text)
+
+        # estimate quote height
+        quote_textwrap_width_pixel = (
+            self.config.card_width - self.config.quote_text_left * 2
+        )
+        quote_textwrap_width = int(
+            quote_textwrap_width_pixel / quote_font.getsize("标")[0]
+        )
+        quote_wrapped_text = textwrap.wrap(card_info.quote, width=quote_textwrap_width)
+        quote_text_height = quote_font.getsize("标")[1]
+        quote_height = quote_line_spacing + (
+            quote_text_height + quote_line_spacing
+        ) * len(quote_wrapped_text)
+        estimated_total_height = discription_height + quote_height
+
+        while (
+            estimated_total_height
+            > self.config.bottom_block_height
+            - self.config.discription_text_to_block_top
+            - self.config.quote_text_to_block_bottom
+        ):
+            alpha = 0.9
+            discription_font_size = int(discription_font_size * alpha)
+            quote_font_size = int(quote_font_size * alpha)
+            discription_line_spacing = int(discription_line_spacing * alpha)
+            quote_line_spacing = int(quote_line_spacing * alpha)
+            discription_font = PIL.ImageFont.truetype(
+                os.path.join(self.config.font_path, self.config.discription_font),
+                discription_font_size,
+            )
+
+            quote_font = PIL.ImageFont.truetype(
+                os.path.join(self.config.font_path, self.config.quote_font),
+                quote_font_size,
+            )
+
+            # estimate discription height
+
+            discription_textwrap_width_pixel = (
+                self.config.card_width - self.config.discription_text_left * 2
+            )
+            discription_textwrap_width = int(
+                discription_textwrap_width_pixel / discription_font.getsize("标")[0]
+            )
+            discription_wrapped_text = textwrap.wrap(
+                card_info.description, width=discription_textwrap_width
+            )
+            discription_text_height = discription_font.getsize("标")[1]
+            discription_height = discription_line_spacing + (
+                discription_text_height + discription_line_spacing
+            ) * len(discription_wrapped_text)
+
+            # estimate quote height
+            quote_textwrap_width_pixel = (
+                self.config.card_width - self.config.quote_text_left * 2
+            )
+            quote_textwrap_width = int(
+                quote_textwrap_width_pixel / quote_font.getsize("标")[0]
+            )
+            quote_wrapped_text = textwrap.wrap(
+                card_info.quote, width=quote_textwrap_width
+            )
+            quote_text_height = quote_font.getsize("标")[1]
+            quote_height = quote_line_spacing + (
+                quote_text_height + quote_line_spacing
+            ) * len(quote_wrapped_text)
+            estimated_total_height = discription_height + quote_height
+
+        # start drawing
+        # draw discription
+        discription_top_pointer = (
             self.config.discription_text_to_block_top
             + self.config.drawing_to_upper
             + self.config.drawing_height
         )
 
-        for line in wrapped_text:
+        for line in discription_wrapped_text:
             base_image = self.add_text_on_image(
                 base_image,
                 line,
                 (
                     self.config.discription_text_left,
-                    top_pointer,
+                    discription_top_pointer,
                 ),
-                font,
+                discription_font,
                 self.config.discription_font_color,
             )
-            top_pointer += self.config.discription_line_spacing + text_height
-        return base_image
-
-    def draw_quote(self, card_info: CardInfo, base_image: PIL.Image):
-        font = PIL.ImageFont.truetype(
-            os.path.join(self.config.font_path, self.config.quote_font),
-            self.config.quote_font_size,
-        )
-        textwrap_width_pixel = self.config.card_width - self.config.quote_text_left * 2
-
-        textwrap_width = int(textwrap_width_pixel / font.getsize("标")[0])
-        wrapped_text = textwrap.wrap(card_info.quote, width=textwrap_width)
-        text_height = font.getsize("标")[1]
-        bottom_pointer = (
+            discription_top_pointer += (
+                discription_line_spacing + discription_text_height
+            )
+        # draw quote
+        quote_bottom_pointer = (
             self.config.bottom_block_height
             + self.config.drawing_to_upper
             + self.config.drawing_height
             - self.config.quote_text_to_block_bottom
-            - text_height
+            - quote_text_height
         )
 
-        for line in reversed(wrapped_text):
+        for line in reversed(quote_wrapped_text):
             base_image = self.add_text_on_image(
                 base_image,
                 line,
                 (
                     self.config.quote_text_left,
-                    bottom_pointer,
+                    quote_bottom_pointer,
                 ),
-                font,
+                quote_font,
                 self.config.quote_font_color,
             )
-            bottom_pointer -= self.config.quote_line_spacing + text_height
+            quote_bottom_pointer -= quote_line_spacing + quote_text_height
+        return base_image
+
+    def draw_gain(self, card_info: CardInfo, base_image: PIL.Image):
+        # estimate the length
+        all_gains = []
+        for ele in card_info.elements_gain.keys():
+            if card_info.elements_gain[ele] > 0:
+                all_gains.append((ele, card_info.elements_gain[ele]))
+        # nothing to do here
+        if len(all_gains) == 0:
+            return base_image
+
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.gain_font),
+            self.config.gain_font_size,
+        )
+
+        number_length = 0
+        for tup in all_gains:
+            number_length += font.getsize(str(tup[1]))[0]
+        category_length = len(all_gains) * self.config.gain_category_width
+        total_length = (
+            number_length
+            + category_length
+            + len(all_gains) * self.config.gain_padding * 2
+            + self.config.gain_padding
+        )
+        # draw the rectangle
+        rect_top = self.config.gain_rect_top
+        rect_right = self.config.gain_rect_right
+        rect_left = rect_right - total_length
+        rect_bottom = rect_top + self.config.gain_rect_height
+        base_image = self.draw_round_corner_rectangle(
+            base_image,
+            (rect_left, rect_top, rect_right, rect_bottom),
+            self.config.gain_rect_radius,
+            self.config.gain_rect_fill,
+            self.config.gain_rect_outline_color,
+            self.config.gain_rect_outline_width,
+        )
+        # put in the numbers and categories
+        text_height = font.getsize("8")[1]
+        right_pointer = (
+            rect_right - self.config.gain_padding - self.config.gain_category_width
+        )
+
+        text_top = int(
+            rect_top
+            + (self.config.gain_rect_height - text_height) / 2
+            - self.config.gain_font_compensation
+        )
+        category_top = int(
+            rect_top
+            + (self.config.gain_rect_height - self.config.gain_category_width) / 2
+        )
+        # sort all gains, put the corresponding element to the head
+        for tup in all_gains:
+            if tup[0] == card_info.category:
+                all_gains.remove(tup)
+                all_gains.insert(0, tup)
+                break
+        # draw the elements
+        for tup in all_gains:
+            # draw the category
+            category_image = self.get_category_image(tup[0])
+            category_image = self.adjust_image(
+                category_image,
+                (
+                    self.config.gain_category_width,
+                    self.config.gain_category_width,
+                ),
+            )
+            base_image.paste(
+                category_image,
+                (right_pointer, category_top),
+                mask=category_image,
+            )
+            right_pointer -= font.getsize(str(tup[1]))[0] + self.config.gain_padding
+
+            # draw the number
+            base_image = self.add_text_on_image(
+                base_image,
+                str(tup[1]),
+                (right_pointer, text_top),
+                font,
+                self.config.gain_font_color,
+            )
+            right_pointer -= self.config.gain_category_width + self.config.gain_padding
+
+        return base_image
+
+    def get_life_image(self):
+        return self.get_image_without_extension(
+            os.path.join(self.config.general_path, "life")
+        )
+
+    def draw_life(self, card_info: CardInfo, base_image: PIL.Image):
+        if card_info.life == 0:
+            return base_image
+        life_image = self.get_life_image()
+        life_image = self.adjust_image(
+            life_image, (self.config.life_icon_width, self.config.life_icon_width)
+        )
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.life_font),
+            self.config.life_font_size,
+        )
+        estimated_length = (
+            font.getsize(str(card_info.life))[0]
+            + self.config.life_padding * 3
+            + self.config.life_icon_width
+        )
+        left = self.config.life_rect_left
+        top = self.config.life_rect_top
+        right = left + estimated_length
+        bottom = top + self.config.life_rect_height
+        base_image = self.draw_round_corner_rectangle(
+            base_image,
+            (left, top, right, bottom),
+            self.config.life_rect_radius,
+            self.config.life_rect_fill,
+            self.config.life_rect_outline_color,
+            self.config.life_rect_outline_width,
+        )
+
+        left_pointer = left + self.config.life_padding
+        life_top = int(
+            self.config.life_rect_top
+            + (self.config.life_rect_height - self.config.life_icon_width) / 2
+        )
+        base_image.paste(
+            life_image,
+            (left_pointer, life_top),
+            mask=life_image,
+        )
+        left_pointer += self.config.life_icon_width + self.config.life_padding
+        life_text_top = int(
+            self.config.life_rect_top
+            + (self.config.life_rect_height - font.getsize(str(card_info.life))[1]) / 2
+            - self.config.life_font_compensation
+        )
+        base_image = self.add_text_on_image(
+            base_image,
+            str(card_info.life),
+            (left_pointer, life_text_top),
+            font,
+            self.config.life_font_color,
+        )
         return base_image
 
     def make_unit_card(self, card_info: CardInfo):
@@ -466,10 +696,12 @@ class CardMaker:
         base_image = self.draw_cost(card_info, base_image)
         # 准备解释
         base_image = self.draw_explanation(card_info, base_image)
-        # 准备卡牌描述
-        base_image = self.draw_discription(card_info, base_image)
-        # 准备引言
-        base_image = self.draw_quote(card_info, base_image)
+        # 准备卡牌描述和引言
+        base_image = self.draw_discription_and_quote(card_info, base_image)
+        # 准备底部负载
+        base_image = self.draw_gain(card_info, base_image)
+        # 准备生命
+        base_image = self.draw_life(card_info, base_image)
         return base_image
 
     def make_ability_card(self, card_info: CardInfo):

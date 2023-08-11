@@ -3,6 +3,7 @@ import PIL.ImageDraw
 import PIL.ImageFont
 import textwrap
 from card_maker import *
+from config import Config_default
 
 # # Load the base image
 # base_image = PIL.Image.open(
@@ -58,7 +59,7 @@ from card_maker import *
 # base_image.save("final.png")
 
 
-config = Config()
+config = Config_default()
 config.general_path = "resources/general"
 config.drawing_path = "resources/drawings"
 cm = CardMaker(config)
@@ -67,11 +68,16 @@ ci = CardInfo()
 ci.category = "水"
 ci.name = "超级水货"
 ci.explanation = "传奇水货·大水货"
-ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒"
+ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒" * 5
 ci.elements_cost["水"] = 2
 ci.elements_cost["光"] = 4
 ci.elements_cost["火"] = 1
 ci.elements_cost["?"] = 1
+ci.elements_gain["水"] = 2
+ci.elements_gain["光"] = 4
+ci.elements_gain["火"] = 1
+ci.elements_gain["?"] = 1
+ci.life = 4
 ci.quote = "我是超级水货！哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"
 card_image = cm.make_unit_card(ci)
 card_image.save("ci.png")
