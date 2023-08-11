@@ -113,3 +113,17 @@ class Config_default(Config):
         self.life_rect_fill = (255, 195, 0)
         self.life_rect_outline_color = (255, 255, 255)
         self.life_rect_outline_width = 3
+        # 底部威力
+        self.power_or_duration_font_size = 24
+        self.power_or_duration_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.power_or_duration_icon_width = 30
+        self.power_or_duration_font_compensation = 2
+        self.power_or_duration_font_color = (0, 0, 0)
+        self.power_or_duration_padding = 10
+        self.power_or_duration_rect_top = 800
+        self.power_or_duration_rect_right = 580
+        self.power_or_duration_rect_height = 50
+        self.power_or_duration_rect_radius = 25
+        self.power_or_duration_rect_fill = (255, 195, 0)
+        self.power_or_duration_rect_outline_color = (255, 255, 255)
+        self.power_or_duration_rect_outline_width = 3

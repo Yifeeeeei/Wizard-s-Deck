@@ -54,7 +54,8 @@ class CardInfo:
         self.version = ""  # 版本号
 
         # 以下是技能卡的独有属性
-        self.cool_down = 0  # 冷却回合数
+        self.duration = 0  # 冷却回合数
+        self.power = 0  # 威力
 
         # 以下是道具卡的独有属性
 
@@ -729,6 +730,89 @@ class CardMaker:
         )
         return base_image
 
+    def get_power_image(self):
+        return self.get_image_without_extension(
+            os.path.join(self.config.general_path, "power")
+        )
+
+    def get_duration_image(self):
+        return self.get_image_without_extension(
+            os.path.join(self.config.general_path, "duration")
+        )
+
+    def draw_power_or_duration(self, card_info: CardInfo, base_image: PIL.Image):
+        image = None
+        text = ""
+        if card_info.duration == 0 and card_info.power == 0:
+            return base_image
+        if card_info.duration > 0:
+            image = self.get_duration_image()
+            text = str(card_info.duration)
+        else:
+            image = self.get_power_image()
+            text = str(card_info.power)
+        image = self.adjust_image(
+            image,
+            (
+                self.config.power_or_duration_icon_width,
+                self.config.power_or_duration_icon_width,
+            ),
+        )
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.power_or_duration_font),
+            self.config.power_or_duration_font_size,
+        )
+        estimated_length = (
+            font.getsize(text)[0]
+            + self.config.power_or_duration_padding * 3
+            + self.config.power_or_duration_icon_width
+        )
+        right = self.config.power_or_duration_rect_right
+        top = self.config.power_or_duration_rect_top
+        left = right - estimated_length
+        bottom = top + self.config.power_or_duration_rect_height
+        base_image = self.draw_round_corner_rectangle(
+            base_image,
+            (left, top, right, bottom),
+            self.config.power_or_duration_rect_radius,
+            self.config.power_or_duration_rect_fill,
+            self.config.power_or_duration_rect_outline_color,
+            self.config.power_or_duration_rect_outline_width,
+        )
+
+        right_pointer = (
+            right - self.config.power_or_duration_padding - font.getsize(text)[0]
+        )
+        power_or_duration_text_top = int(
+            self.config.power_or_duration_rect_top
+            + (self.config.power_or_duration_rect_height - font.getsize(text)[1]) / 2
+            - self.config.power_or_duration_font_compensation
+        )
+        base_image = self.add_text_on_image(
+            base_image,
+            text,
+            (right_pointer, power_or_duration_text_top),
+            font,
+            self.config.power_or_duration_font_color,
+        )
+        right_pointer -= self.config.life_icon_width + self.config.life_padding
+        power_or_duration_top = int(
+            self.config.power_or_duration_rect_top
+            + (
+                self.config.power_or_duration_rect_height
+                - self.config.power_or_duration_icon_width
+            )
+            / 2
+        )
+
+        base_image.paste(
+            image,
+            (right_pointer, power_or_duration_top),
+            mask=image,
+        )
+
+        return base_image
+
     def make_unit_card(self, card_info: CardInfo):
         # 准备底层
         base_image = self.prepare_outline(card_info)
@@ -747,10 +831,35 @@ class CardMaker:
         return base_image
 
     def make_ability_card(self, card_info: CardInfo):
-        pass
+        # 准备底层
+        base_image = self.prepare_outline(card_info)
+        # 准备左上角元素+名称
+        base_image = self.draw_category_and_name(card_info, base_image)
+        # 准备费用
+        base_image = self.draw_cost(card_info, base_image)
+        # 准备标签
+        base_image = self.draw_tag(card_info, base_image)
+        # 准备卡牌描述和引言
+        base_image = self.draw_discription_and_quote(card_info, base_image)
+        # 准备威力
+        base_image = self.draw_power_or_duration(card_info, base_image)
+        # 准备持续时间
+        return base_image
 
     def make_item_card(self, card_info: CardInfo):
-        pass
+        # 准备底层
+        base_image = self.prepare_outline(card_info)
+        # 准备左上角元素+名称
+        base_image = self.draw_category_and_name(card_info, base_image)
+        # 准备费用
+        base_image = self.draw_cost(card_info, base_image)
+        # 准备标签
+        base_image = self.draw_tag(card_info, base_image)
+        # 准备卡牌描述和引言
+        base_image = self.draw_discription_and_quote(card_info, base_image)
+        # 准备底部负载
+        base_image = self.draw_gain(card_info, base_image)
+        return base_image
 
     def make_card(self, card_info: CardInfo):
         if card_info.type == "生物":
