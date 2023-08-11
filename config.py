@@ -44,6 +44,7 @@ class Config_default(Config):
         self.name_rect_radius = 10
         self.name_rect_fill = (255, 195, 0)
         self.name_text_to_left = 90
+        self.name_text_left_compensation = 5
         self.name_rect_outline_color = (255, 255, 255)
         self.name_rect_outline_width = 3
         self.name_text_font_color = (0, 0, 0)

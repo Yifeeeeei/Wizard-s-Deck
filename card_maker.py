@@ -268,13 +268,6 @@ class CardMaker:
         draw.text(left_top, text, font=font, fill=color)
         return image
 
-    # def get_category_image(self, card_info: CardInfo):
-    #     return self.get_image_without_extension(
-    #         os.path.join(
-    #             self.config.general_path, "ele_" + self.translator(card_info.category)
-    #         )
-    #     )
-
     def get_category_image(self, category: str):
         return self.get_image_without_extension(
             os.path.join(self.config.general_path, "ele_" + self.translator(category))
@@ -302,7 +295,9 @@ class CardMaker:
             self.config.name_rect_outline_color,
             self.config.name_rect_outline_width,
         )
-        text_left = self.config.name_text_to_left
+        text_left = (
+            self.config.name_text_to_left + self.config.name_text_left_compensation
+        )
         text_height = text_font.getsize(card_info.name)[1]
         text_top = (
             self.config.name_rect_top + (self.config.name_rect_height - text_height) / 2
