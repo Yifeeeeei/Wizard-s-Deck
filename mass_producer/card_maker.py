@@ -307,9 +307,9 @@ class CardMaker:
 
         return image
 
-    def add_text_on_image(self, image, text, left_top, font, color):
+    def add_text_on_image(self, image, text, left_top, font, color, features=None):
         draw = PIL.ImageDraw.Draw(image)
-        draw.text(left_top, text, font=font, fill=color)
+        draw.text(left_top, text, font=font, fill=color, features=features)
         return image
 
     def get_category_image(self, category: str):
@@ -615,7 +615,7 @@ class CardMaker:
                 base_image,
                 line,
                 (
-                    self.config.quote_text_left,
+                    (self.config.card_width - quote_font.getsize(line)[0]) / 2,
                     quote_bottom_pointer,
                 ),
                 quote_font,
@@ -950,6 +950,27 @@ class CardMaker:
 
         return base_image
 
+    def draw_number(self, card_info: CardInfo, base_image: PIL.Image):
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.number_font),
+            self.config.number_font_size,
+        )
+        base_image = self.add_text_on_image(
+            base_image,
+            "No." + str(card_info.number),
+            (
+                self.config.card_width
+                - self.config.number_text_to_right
+                - font.getsize("No." + str(card_info.number))[0],
+                self.config.drawing_to_upper
+                + self.config.drawing_height
+                + self.config.number_text_to_block_top,
+            ),
+            font,
+            self.config.number_font_color,
+        )
+        return base_image
+
     def make_unit_card(self, card_info: CardInfo):
         # 准备底层
         base_image = self.prepare_outline(card_info)
@@ -965,6 +986,8 @@ class CardMaker:
         base_image = self.draw_gain(card_info, base_image)
         # 准备生命
         base_image = self.draw_life(card_info, base_image)
+        # 准备卡牌编号
+        base_image = self.draw_number(card_info, base_image)
         return base_image
 
     def make_ability_card(self, card_info: CardInfo):
@@ -982,7 +1005,8 @@ class CardMaker:
         base_image = self.draw_discription_and_quote(card_info, base_image)
         # 准备威力或持续时间
         base_image = self.draw_power_or_duration(card_info, base_image)
-        # 准备持续时间
+        # 准备卡牌编号
+        base_image = self.draw_number(card_info, base_image)
         return base_image
 
     def make_item_card(self, card_info: CardInfo):
@@ -998,6 +1022,8 @@ class CardMaker:
         base_image = self.draw_discription_and_quote(card_info, base_image)
         # 准备底部负载
         base_image = self.draw_gain(card_info, base_image)
+        # 准备卡牌编号
+        base_image = self.draw_number(card_info, base_image)
         return base_image
 
     def make_card(self, card_info: CardInfo):

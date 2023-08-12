@@ -95,7 +95,7 @@ class Config_default(Config):
         self.discription_line_spacing = 10
         # 卡牌引言
         self.quote_font = "FangZhengKaiTiJianTi-1.ttf"
-        self.quote_font_size = 18
+        self.quote_font_size = 20
         self.quote_font_color = (32, 32, 32)
         self.quote_text_left = 100
         self.quote_text_to_block_bottom = 40
@@ -142,3 +142,10 @@ class Config_default(Config):
         self.power_or_duration_rect_fill = (255, 195, 0)
         self.power_or_duration_rect_outline_color = (255, 255, 255)
         self.power_or_duration_rect_outline_width = 3
+        # 绘制卡牌编号
+        self.number_font_size = 20
+        self.number_font_color = (0, 0, 0)
+        self.number_text_to_right = 50
+        self.number_text_to_block_top = 15
+
+        self.number_font = "ShareTechMono-Regular.ttf"
