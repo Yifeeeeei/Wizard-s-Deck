@@ -1,0 +1,18 @@
+{
+    "生物":{
+        "xlsx_paths":["生物.xlsx"],
+        "drawing_paths":["drawings"]
+    },
+    "技能":{
+        "xlsx_paths":["技能.xlsx"],
+        "drawing_paths":["drawings"]
+    },
+    "道具":{
+        "xlsx_paths":["道具.xlsx"],
+        "drawing_paths":["drawings"]
+    },
+    "overwrite":true,
+    "output_path":"output",
+    "general_path":"resources/general",
+    "font_path":"resources/fonts"
+}

@@ -16,7 +16,7 @@ class Config_default(Config):
         super().__init__()
         # 路径
         self.general_path = os.path.join("resources", "gerneral")  # 通用素材
-        self.drawing_path = os.path.join("resources", "drawings")  # 卡牌原画
+        self.drawing_path = "drawings"  # 卡牌原画
         self.font_path = os.path.join("resources", "fonts")  # 字体
         # 卡片
         self.card_width = 590
@@ -57,7 +57,7 @@ class Config_default(Config):
         self.cost_category_width = 30
         self.cost_font_compensation = 2
         self.cost_font_color = (0, 0, 0)
-        self.cost_padding = 10
+        self.cost_padding = 5
         self.cost_rect_top = 530
         self.cost_rect_left = 10
         self.cost_rect_height = 50
@@ -65,6 +65,21 @@ class Config_default(Config):
         self.cost_rect_fill = (255, 195, 0)
         self.cost_rect_outline_color = (255, 255, 255)
         self.cost_rect_outline_width = 3
+        # 中央代价
+        self.expense_font_size = 24
+        self.expense_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.expense_category_width = 30
+        self.expense_font_compensation = 2
+        self.expense_font_color = (0, 0, 0)
+        self.expense_padding = 5
+        self.expense_rect_top = 530
+        self.expense_rect_right = 580
+        self.expense_rect_height = 50
+        self.expense_rect_radius = 25
+        self.expense_rect_fill = (255, 195, 0)
+        self.expense_rect_outline_color = (255, 255, 255)
+        self.expense_rect_outline_width = 3
+
         # 标签
         self.tag_font = "FangZhengKaiTiJianTi-1.ttf"
         self.tag_font_size = 24
@@ -91,7 +106,7 @@ class Config_default(Config):
         self.gain_category_width = 30
         self.gain_font_compensation = 1
         self.gain_font_color = (0, 0, 0)
-        self.gain_padding = 10
+        self.gain_padding = 5
         self.gain_rect_top = 800
         self.gain_rect_right = 580
         self.gain_rect_height = 50
@@ -113,7 +128,7 @@ class Config_default(Config):
         self.life_rect_fill = (255, 195, 0)
         self.life_rect_outline_color = (255, 255, 255)
         self.life_rect_outline_width = 3
-        # 底部威力
+        # 底部威力或持续时间
         self.power_or_duration_font_size = 24
         self.power_or_duration_font = "SplineSansMono-VariableFont_wght.ttf"
         self.power_or_duration_icon_width = 30

@@ -35,6 +35,13 @@ class Elements:
     def values(self):
         return self.elements_dict.values()
 
+    def __str__(self) -> str:
+        s = ""
+        for ele in self.elements_dict.keys():
+            if self.elements_dict[ele] > 0:
+                s += ele + ":" + str(self.elements_dict[ele]) + " "
+        return s
+
 
 class CardInfo:
     def __init__(self) -> None:
@@ -56,8 +63,26 @@ class CardInfo:
         # 以下是技能卡的独有属性
         self.duration = 0  # 冷却回合数
         self.power = 0  # 威力
+        self.elements_expense = Elements({})  # 代价（为彩笔？）
 
         # 以下是道具卡的独有属性
+
+    def __str__(self):
+        s = ""
+        s += "类别" + self.type + "\n"
+        s += "名称" + self.name + "\n"
+        s += "元素" + self.category + "\n"
+        s += "标签" + self.tag + "\n"
+        s += "效果" + self.description + "\n"
+        s += "引言" + self.quote + "\n"
+        s += "费用" + str(self.elements_cost) + "\n"
+        s += "负载" + str(self.elements_gain) + "\n"
+        s += "生命" + str(self.life) + "\n"
+        s += "版本" + str(self.version) + "\n"
+        s += "持续" + str(self.duration) + "\n"
+        s += "威力" + str(self.power) + "\n"
+        s += "代价" + str(self.elements_expense) + "\n"
+        return s
 
 
 """
@@ -130,14 +155,31 @@ class CardMaker:
         )
         return bg_image
 
-    def get_border(self):
-        border_image = self.get_image_without_extension(
-            os.path.join(self.config.general_path, "border")
-        )
-        border_image = self.adjust_image(
-            border_image, (self.config.border_width, self.config.border_height)
-        )
-        return border_image
+    def get_border(self, card_info: CardInfo):
+        if card_info.type == "生物":
+            border_image = self.get_image_without_extension(
+                os.path.join(self.config.general_path, "border")
+            )
+            border_image = self.adjust_image(
+                border_image, (self.config.border_width, self.config.border_height)
+            )
+            return border_image
+        elif card_info.type == "技能":
+            border_image = self.get_image_without_extension(
+                os.path.join(self.config.general_path, "border1")
+            )
+            border_image = self.adjust_image(
+                border_image, (self.config.border_width, self.config.border_height)
+            )
+            return border_image
+        elif card_info.type == "道具":
+            border_image = self.get_image_without_extension(
+                os.path.join(self.config.general_path, "border3")
+            )
+            border_image = self.adjust_image(
+                border_image, (self.config.border_width, self.config.border_height)
+            )
+            return border_image
 
     def draw_bottom_block(self, base_image, card_info: CardInfo):
         if not self.is_legend(card_info):
@@ -210,7 +252,7 @@ class CardMaker:
             base_image = self.draw_bottom_block(base_image, card_info)
 
             # 获取边框
-            border_image = self.get_border()
+            border_image = self.get_border(card_info)
             # 添加边框
             base_image.paste(
                 border_image,
@@ -813,6 +855,100 @@ class CardMaker:
 
         return base_image
 
+    def draw_expense(self, card_info: CardInfo, base_image: PIL.Image):
+        # estimate the length
+        all_expenses = []
+        for ele in card_info.elements_expense.keys():
+            if card_info.elements_expense[ele] > 0:
+                all_expenses.append((ele, card_info.elements_expense[ele]))
+        # nothing to do here
+        if len(all_expenses) == 0:
+            return base_image
+
+        font = PIL.ImageFont.truetype(
+            os.path.join(self.config.font_path, self.config.expense_font),
+            self.config.expense_font_size,
+        )
+
+        number_length = 0
+        for tup in all_expenses:
+            number_length += font.getsize(str(tup[1]))[0]
+        category_length = len(all_expenses) * self.config.expense_category_width
+        total_length = (
+            number_length
+            + category_length
+            + len(all_expenses) * self.config.expense_padding * 2
+            + self.config.expense_padding
+        )
+        # draw the rectangle
+        rect_top = self.config.expense_rect_top
+        rect_right = self.config.expense_rect_right
+        rect_left = rect_right - total_length
+        rect_bottom = rect_top + self.config.expense_rect_height
+        base_image = self.draw_round_corner_rectangle(
+            base_image,
+            (rect_left, rect_top, rect_right, rect_bottom),
+            self.config.expense_rect_radius,
+            self.config.expense_rect_fill,
+            self.config.expense_rect_outline_color,
+            self.config.expense_rect_outline_width,
+        )
+        # put in the numbers and categories
+        text_height = font.getsize("8")[1]
+        right_pointer = (
+            rect_right
+            - self.config.expense_padding
+            - self.config.expense_category_width
+        )
+
+        text_top = int(
+            rect_top
+            + (self.config.expense_rect_height - text_height) / 2
+            - self.config.expense_font_compensation
+        )
+        category_top = int(
+            rect_top
+            + (self.config.expense_rect_height - self.config.expense_category_width) / 2
+        )
+        # sort all expenses, put the corresponding element to the head
+        for tup in all_expenses:
+            if tup[0] == card_info.category:
+                all_expenses.remove(tup)
+                all_expenses.insert(0, tup)
+                break
+        all_expenses = reversed(all_expenses)
+        # draw the elements
+        for tup in all_expenses:
+            # draw the category
+            category_image = self.get_category_image(tup[0])
+            category_image = self.adjust_image(
+                category_image,
+                (
+                    self.config.expense_category_width,
+                    self.config.expense_category_width,
+                ),
+            )
+            base_image.paste(
+                category_image,
+                (right_pointer, category_top),
+                mask=category_image,
+            )
+            right_pointer -= font.getsize(str(tup[1]))[0] + self.config.expense_padding
+
+            # draw the number
+            base_image = self.add_text_on_image(
+                base_image,
+                str(tup[1]),
+                (right_pointer, text_top),
+                font,
+                self.config.expense_font_color,
+            )
+            right_pointer -= (
+                self.config.expense_category_width + self.config.expense_padding
+            )
+
+        return base_image
+
     def make_unit_card(self, card_info: CardInfo):
         # 准备底层
         base_image = self.prepare_outline(card_info)
@@ -837,11 +973,13 @@ class CardMaker:
         base_image = self.draw_category_and_name(card_info, base_image)
         # 准备费用
         base_image = self.draw_cost(card_info, base_image)
+        # 准备代价
+        base_image = self.draw_expense(card_info, base_image)
         # 准备标签
         base_image = self.draw_tag(card_info, base_image)
         # 准备卡牌描述和引言
         base_image = self.draw_discription_and_quote(card_info, base_image)
-        # 准备威力
+        # 准备威力或持续时间
         base_image = self.draw_power_or_duration(card_info, base_image)
         # 准备持续时间
         return base_image
