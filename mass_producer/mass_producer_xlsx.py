@@ -170,7 +170,7 @@ class MassProducerXlsx:
                                 self.mass_producer_params["output_path"],
                                 card_type,
                                 self.dir_ele_translator(card_info.category),
-                                str(card_info.number) + ".jpg",
+                                str(card_info.number) + "_" + card_info.name + ".jpg",
                             )
                         )
 
