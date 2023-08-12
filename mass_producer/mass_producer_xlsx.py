@@ -76,6 +76,8 @@ class MassProducerXlsx:
 
     def get_card_info_from_row(self, df_row):
         card_info = CardInfo()
+        if "编号" in df_row.keys():
+            card_info.number = str(df_row["编号"])
         if "属性" in df_row.keys():
             card_info.category = str(df_row["属性"]).strip()
         if "名称" in df_row.keys():
@@ -90,6 +92,8 @@ class MassProducerXlsx:
                 if pd.isnull(df_row["条件"])
                 else self.element_analysis(df_row["条件"])
             )
+        if "种类" in df_row.keys():
+            card_info.tag = str(df_row["种类"])
         if "负载" in df_row.keys():
             card_info.elements_gain = (
                 Elements({})
@@ -143,7 +147,6 @@ class MassProducerXlsx:
                 )
 
             for sheet_name, df in current_sheets.items():
-                current_element = self.keyword_element_extraction(sheet_name)
                 print(
                     "making cards in",
                     self.mass_producer_params[card_type]["xlsx_paths"][i],
@@ -167,7 +170,7 @@ class MassProducerXlsx:
                                 self.mass_producer_params["output_path"],
                                 card_type,
                                 self.dir_ele_translator(card_info.category),
-                                card_info.name + ".jpg",
+                                str(card_info.number) + ".jpg",
                             )
                         )
 

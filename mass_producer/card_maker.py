@@ -45,6 +45,7 @@ class Elements:
 
 class CardInfo:
     def __init__(self) -> None:
+        self.number = 0
         self.type = ""  # 生物、技能、道具三选一
         self.name = ""
         self.category = ""  # 火水地光暗?
@@ -141,7 +142,7 @@ class CardMaker:
 
     def get_drawing(self, card_info: CardInfo):
         return self.get_image_without_extension(
-            os.path.join(self.config.drawing_path, card_info.name)
+            os.path.join(self.config.drawing_path, str(card_info.number))
         )
 
     def get_background(self, card_info: CardInfo):
