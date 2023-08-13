@@ -130,7 +130,7 @@ class MassProducerXlsx:
         return card_info
 
     def draw_cards(self, card_type):
-        if card_type not in ["生物", "技能", "道具"]:
+        if card_type not in ["生物", "技能", "道具", "英雄"]:
             raise ValueError("卡牌类型错误")
         assert len(self.mass_producer_params[card_type]["xlsx_paths"]) == len(
             self.mass_producer_params[card_type]["drawing_paths"]
@@ -209,3 +209,6 @@ class MassProducerXlsx:
         if "道具" in self.mass_producer_params.keys():
             # 开始绘制道具牌
             self.draw_cards("道具")
+        if "英雄" in self.mass_producer_params.keys():
+            # 开始绘制英雄牌
+            self.draw_cards("英雄")

@@ -48,6 +48,8 @@ class Config_default(Config):
         self.border_width = 580
         self.border_height = 830
         self.type_border = {"生物": "border", "技能": "border4", "道具": "border3"}
+        # 英雄牌
+        self.reverse_color_for_hero = True
         # 底部的白色块
         self.bottom_block_width = 540
         self.bottom_block_height = 260

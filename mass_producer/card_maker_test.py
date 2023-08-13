@@ -61,11 +61,12 @@ from config import Config_default
 
 config = Config_default()
 config.general_path = "resources/general"
-config.drawing_path = "resources/drawings"
+config.drawing_path = "drawings/地"
 cm = CardMaker(config)
 
 ci = CardInfo()
 ci.category = "暗"
+ci.number = 114514
 ci.type = "技能"
 ci.duration = 4
 ci.name = "超级水货"

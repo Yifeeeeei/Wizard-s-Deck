@@ -11,6 +11,10 @@
         "xlsx_paths":["sheets/道具.xlsx"],
         "drawing_paths":["drawings"]
     },
+    "英雄":{
+        "xlsx_paths":["sheets/生物.xlsx"],
+        "drawing_paths":["drawings"]
+    },
     "overwrite":true,
     "output_path":"output",
     "general_path":"resources/general",

@@ -167,6 +167,9 @@ class CardMaker:
         )
         return border_image
 
+    def reverse_color(self, color):
+        return (255 - color[0], 255 - color[1], 255 - color[2])
+
     def draw_bottom_block(self, base_image, card_info: CardInfo):
         if not self.is_legend(card_info):
             new_image = PIL.Image.new("RGBA", base_image.size, (255, 255, 255, 0))
@@ -180,10 +183,13 @@ class CardMaker:
             )
             right = left + self.config.bottom_block_width
 
+            color = self.config.bottom_block_color
+            if self.config.reverse_color_for_hero and card_info.type == "英雄":
+                color = self.reverse_color(color)
+
             draw.rectangle(
                 ((left, top), (right, bottom)),
-                fill=self.config.bottom_block_color
-                + (self.config.bottom_block_transparency,),
+                fill=color + (self.config.bottom_block_transparency,),
             )
             out = PIL.Image.alpha_composite(base_image, new_image)
             return out
@@ -198,18 +204,20 @@ class CardMaker:
                 + self.config.bottom_block_height
             )
             right = left + self.config.bottom_block_width
+            color = self.config.bottom_block_color
+            if self.config.reverse_color_for_hero and card_info.type == "英雄":
+                color = self.reverse_color(color)
 
             draw.rounded_rectangle(
                 ((left, top), (right, bottom)),
                 self.config.bottom_block_legend_radius,
-                fill=self.config.bottom_block_color
-                + (self.config.bottom_block_transparency,),
+                fill=color + (self.config.bottom_block_transparency,),
             )
             out = PIL.Image.alpha_composite(base_image, new_image)
             return out
 
     def is_legend(self, card_info: CardInfo):
-        if "传说" in card_info.tag or "传奇" in card_info.tag:
+        if "传说" in card_info.tag or "传奇" in card_info.tag or card_info.type == "英雄":
             return True
         return False
 
@@ -449,6 +457,9 @@ class CardMaker:
             os.path.join(self.config.font_path, self.config.tag_font),
             self.config.tag_font_size,
         )
+        color = self.config.tag_font_color
+        if self.config.reverse_color_for_hero and card_info.type == "英雄":
+            color = self.reverse_color(color)
         base_image = self.add_text_on_image(
             base_image,
             card_info.tag,
@@ -459,7 +470,7 @@ class CardMaker:
                 + self.config.drawing_height,
             ),
             font,
-            self.config.tag_font_color,
+            color,
         )
         return base_image
 
@@ -571,6 +582,9 @@ class CardMaker:
             + self.config.drawing_to_upper
             + self.config.drawing_height
         )
+        discription_color = self.config.discription_font_color
+        if self.config.reverse_color_for_hero and card_info.type == "英雄":
+            discription_color = self.reverse_color(discription_color)
 
         for line in discription_wrapped_text:
             base_image = self.add_text_on_image(
@@ -581,7 +595,7 @@ class CardMaker:
                     discription_top_pointer,
                 ),
                 discription_font,
-                self.config.discription_font_color,
+                discription_color,
             )
             discription_top_pointer += (
                 discription_line_spacing + discription_text_height
@@ -594,6 +608,9 @@ class CardMaker:
             - self.config.quote_text_to_block_bottom
             - quote_text_height
         )
+        quote_color = self.config.quote_font_color
+        if self.config.reverse_color_for_hero and card_info.type == "英雄":
+            quote_color = self.reverse_color(quote_color)
 
         for line in reversed(quote_wrapped_text):
             base_image = self.add_text_on_image(
@@ -604,7 +621,7 @@ class CardMaker:
                     quote_bottom_pointer,
                 ),
                 quote_font,
-                self.config.quote_font_color,
+                quote_color,
             )
             quote_bottom_pointer -= quote_line_spacing + quote_text_height
         return base_image
@@ -940,6 +957,9 @@ class CardMaker:
             os.path.join(self.config.font_path, self.config.number_font),
             self.config.number_font_size,
         )
+        color = self.config.number_font_color
+        if self.config.reverse_color_for_hero and card_info.type == "英雄":
+            color = self.reverse_color(color)
         base_image = self.add_text_on_image(
             base_image,
             "No." + str(card_info.number),
@@ -952,7 +972,7 @@ class CardMaker:
                 + self.config.number_text_to_block_top,
             ),
             font,
-            self.config.number_font_color,
+            color,
         )
         return base_image
 
@@ -1011,6 +1031,25 @@ class CardMaker:
         base_image = self.draw_number(card_info, base_image)
         return base_image
 
+    def make_hero_card(self, card_info: CardInfo):
+        # 准备底层
+        base_image = self.prepare_outline(card_info)
+        # 准备左上角元素+名称
+        base_image = self.draw_category_and_name(card_info, base_image)
+        # 准备费用
+        base_image = self.draw_cost(card_info, base_image)
+        # 准备标签
+        base_image = self.draw_tag(card_info, base_image)
+        # 准备卡牌描述和引言
+        base_image = self.draw_discription_and_quote(card_info, base_image)
+        # 准备底部负载
+        base_image = self.draw_gain(card_info, base_image)
+        # 准备生命
+        base_image = self.draw_life(card_info, base_image)
+        # 准备卡牌编号
+        base_image = self.draw_number(card_info, base_image)
+        return base_image
+
     def make_card(self, card_info: CardInfo):
         if card_info.type == "生物":
             result = self.make_unit_card(card_info)
@@ -1019,5 +1058,8 @@ class CardMaker:
             result = self.make_ability_card(card_info)
             return result
         elif card_info.type == "道具":
+            result = self.make_item_card(card_info)
+            return result
+        elif card_info.type == "英雄":
             result = self.make_item_card(card_info)
             return result
