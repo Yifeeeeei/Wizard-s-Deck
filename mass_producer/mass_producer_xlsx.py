@@ -77,18 +77,20 @@ class MassProducerXlsx:
     def get_card_info_from_row(self, df_row):
         card_info = CardInfo()
         if "编号" in df_row.keys():
-            card_info.number = str(df_row["编号"])
+            card_info.number = "" if pd.isnull(df_row["编号"]) else str(int(df_row["编号"]))
         if "属性" in df_row.keys():
-            card_info.category = str(df_row["属性"]).strip()
+            card_info.category = (
+                "" if pd.isnull(df_row["属性"]) else str(df_row["属性"]).strip()
+            )
         if "名称" in df_row.keys():
-            card_info.name = str(df_row["名称"])
+            card_info.name = "" if pd.isnull(df_row["名称"]) else str(df_row["名称"])
         if "标签" in df_row.keys():
-            card_info.tag = str(df_row["标签"])
+            card_info.tag = "" if pd.isnull(df_row["标签"]) else str(df_row["标签"])
         if "生命" in df_row.keys():
             card_info.life = int(0 if pd.isnull(df_row["生命"]) else df_row["生命"])
         if "条件" in df_row.keys():
             card_info.elements_cost = (
-                Elements()
+                Elements({})
                 if pd.isnull(df_row["条件"])
                 else self.element_analysis(df_row["条件"])
             )
@@ -116,6 +118,14 @@ class MassProducerXlsx:
             )
         if "版本" in df_row.keys():
             card_info.description = "" if pd.isnull(df_row["版本"]) else str(df_row["版本"])
+        if (
+            card_info.number == ""
+            or card_info.name == ""
+            or card_info.category == ""
+            or card_info.tag == ""
+        ):
+            # 空行
+            return None
 
         return card_info
 
@@ -156,6 +166,8 @@ class MassProducerXlsx:
                 for index, row in tqdm(df.iterrows()):
                     # print(card_maker.config.drawings_path)
                     card_info = self.get_card_info_from_row(row)
+                    if card_info is None:
+                        continue
                     card_maker.config.drawing_path = os.path.join(
                         current_drawing_path,
                         self.dir_ele_translator(card_info.category),
