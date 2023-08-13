@@ -24,7 +24,7 @@ class Config_default(Config):
             "暗": "ele_dark",
             "水": "ele_water",
             "火": "ele_fire",
-            "风": "ele_wind",
+            "气": "ele_air",
             "地": "ele_earth",
             "?": "ele_none",
         }
@@ -33,7 +33,7 @@ class Config_default(Config):
             "暗": "back_dark",
             "水": "back_water",
             "火": "back_fire",
-            "风": "back_wind",
+            "气": "back_air",
             "地": "back_earth",
             "?": "back_none",
         }

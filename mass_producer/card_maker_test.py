@@ -65,12 +65,12 @@ config.drawing_path = "drawings/地"
 cm = CardMaker(config)
 
 ci = CardInfo()
-ci.category = "暗"
+ci.category = "气"
 ci.number = 114514
-ci.type = "技能"
+ci.type = "英雄"
 ci.duration = 4
 ci.name = "超级水货"
-ci.tag = "道具·大水货"
+ci.tag = "传奇道具·大水货"
 ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒" * 2
 ci.elements_cost["水"] = 2
 ci.elements_cost["光"] = 5

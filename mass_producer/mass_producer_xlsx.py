@@ -15,8 +15,8 @@ class MassProducerXlsx:
         )
         self.card_maker_config.general_path = self.mass_producer_params["general_path"]
         self.card_maker_config.font_path = self.mass_producer_params["font_path"]
-        self.all_elements = ["水", "火", "光", "暗", "风", "地", "?"]
-        self.blur_elements = ["水", "火", "光", "暗", "风", "地", "?", "无", "？"]
+        self.all_elements = ["水", "火", "光", "暗", "气", "地", "?"]
+        self.blur_elements = ["水", "火", "光", "暗", "气", "地", "?", "无", "？"]
 
     def make_dir(
         self,
@@ -41,8 +41,8 @@ class MassProducerXlsx:
             return "火"
         if "暗" in sentence:
             return "暗"
-        if "风" in sentence:
-            return "风"
+        if "气" in sentence:
+            return "气"
         if "地" in sentence:
             return "地"
         if "无" in sentence or "?" or "？" in sentence:
@@ -57,8 +57,8 @@ class MassProducerXlsx:
             return "火"
         if "暗" in sentence:
             return "暗"
-        if "风" in sentence:
-            return "风"
+        if "气" in sentence:
+            return "气"
         if "地" in sentence:
             return "地"
         if "无" in sentence or "?" or "？" in sentence:
@@ -165,7 +165,11 @@ class MassProducerXlsx:
 
                 for index, row in tqdm(df.iterrows()):
                     # print(card_maker.config.drawings_path)
-                    card_info = self.get_card_info_from_row(row)
+                    try:
+                        card_info = self.get_card_info_from_row(row)
+                    except Exception as e:
+                        print("Error encountered when parsing row: ", row, e)
+                        continue
                     if card_info is None:
                         continue
                     card_maker.config.drawing_path = os.path.join(

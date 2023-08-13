@@ -15,7 +15,7 @@ from config import Config
 class Elements:
     def __init__(self, elements_dict) -> None:
         self.elements_dict = elements_dict
-        all_elements = ["光", "暗", "火", "水", "地", "风", "?"]
+        all_elements = ["光", "暗", "火", "水", "地", "气", "?"]
         for ele in all_elements:
             if ele not in elements_dict:
                 elements_dict[ele] = 0
@@ -104,8 +104,8 @@ class CardMaker:
             return "fire"
         elif chi == "水":
             return "water"
-        elif chi == "风":
-            return "wind"
+        elif chi == "气":
+            return "air"
         elif chi == "地":
             return "earth"
         elif chi == "?" or chi == "无" or chi == "？":
