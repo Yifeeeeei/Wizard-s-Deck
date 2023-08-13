@@ -28,7 +28,7 @@ class Config_default(Config):
         # 卡片边框
         self.border_width = 580
         self.border_height = 830
-        self.type_border = {"生物": "border", "技能": "border2", "道具": "border3"}
+        self.type_border = {"生物": "border", "技能": "border1", "道具": "border3"}
         # 底部的白色块
         self.bottom_block_width = 540
         self.bottom_block_height = 260
