@@ -28,7 +28,7 @@ class Config_default(Config):
         # 卡片边框
         self.border_width = 580
         self.border_height = 830
-
+        self.type_border = {"生物": "border", "技能": "border2", "道具": "border3"}
         # 底部的白色块
         self.bottom_block_width = 540
         self.bottom_block_height = 260
@@ -52,8 +52,8 @@ class Config_default(Config):
         self.name_category_left = 5
         self.name_category_top = 5
         # 中央消耗
-        self.cost_font_size = 24
-        self.cost_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.cost_font_size = 30
+        self.cost_font = "ShareTechMono-Regular.ttf"
         self.cost_category_width = 30
         self.cost_font_compensation = 2
         self.cost_font_color = (0, 0, 0)
@@ -66,8 +66,8 @@ class Config_default(Config):
         self.cost_rect_outline_color = (255, 255, 255)
         self.cost_rect_outline_width = 3
         # 中央代价
-        self.expense_font_size = 24
-        self.expense_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.expense_font_size = 30
+        self.expense_font = "ShareTechMono-Regular.ttf"
         self.expense_category_width = 30
         self.expense_font_compensation = 2
         self.expense_font_color = (0, 0, 0)
@@ -79,7 +79,6 @@ class Config_default(Config):
         self.expense_rect_fill = (255, 195, 0)
         self.expense_rect_outline_color = (255, 255, 255)
         self.expense_rect_outline_width = 3
-
         # 标签
         self.tag_font = "FangZhengKaiTiJianTi-1.ttf"
         self.tag_font_size = 24
@@ -101,8 +100,8 @@ class Config_default(Config):
         self.quote_text_to_block_bottom = 40
         self.quote_line_spacing = 5
         # 底部负载
-        self.gain_font_size = 24
-        self.gain_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.gain_font_size = 30
+        self.gain_font = "ShareTechMono-Regular.ttf"
         self.gain_category_width = 30
         self.gain_font_compensation = 1
         self.gain_font_color = (0, 0, 0)
@@ -115,12 +114,12 @@ class Config_default(Config):
         self.gain_rect_outline_color = (255, 255, 255)
         self.gain_rect_outline_width = 3
         # 底部生命
-        self.life_font_size = 24
-        self.life_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.life_font_size = 30
+        self.life_font = "ShareTechMono-Regular.ttf"
         self.life_icon_width = 30
         self.life_font_compensation = 2
         self.life_font_color = (0, 0, 0)
-        self.life_padding = 10
+        self.life_padding = 5
         self.life_rect_top = 800
         self.life_rect_left = 10
         self.life_rect_height = 50
@@ -129,12 +128,12 @@ class Config_default(Config):
         self.life_rect_outline_color = (255, 255, 255)
         self.life_rect_outline_width = 3
         # 底部威力或持续时间
-        self.power_or_duration_font_size = 24
-        self.power_or_duration_font = "SplineSansMono-VariableFont_wght.ttf"
+        self.power_or_duration_font_size = 30
+        self.power_or_duration_font = "ShareTechMono-Regular.ttf"
         self.power_or_duration_icon_width = 30
         self.power_or_duration_font_compensation = 2
         self.power_or_duration_font_color = (0, 0, 0)
-        self.power_or_duration_padding = 10
+        self.power_or_duration_padding = 5
         self.power_or_duration_rect_top = 800
         self.power_or_duration_rect_right = 580
         self.power_or_duration_rect_height = 50
@@ -146,6 +145,5 @@ class Config_default(Config):
         self.number_font_size = 20
         self.number_font_color = (0, 0, 0)
         self.number_text_to_right = 50
-        self.number_text_to_block_top = 15
-
+        self.number_text_to_block_top = 17
         self.number_font = "ShareTechMono-Regular.ttf"

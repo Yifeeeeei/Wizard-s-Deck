@@ -157,30 +157,15 @@ class CardMaker:
         return bg_image
 
     def get_border(self, card_info: CardInfo):
-        if card_info.type == "生物":
-            border_image = self.get_image_without_extension(
-                os.path.join(self.config.general_path, "border")
+        border_image = self.get_image_without_extension(
+            os.path.join(
+                self.config.general_path, self.config.type_border[card_info.type]
             )
-            border_image = self.adjust_image(
-                border_image, (self.config.border_width, self.config.border_height)
-            )
-            return border_image
-        elif card_info.type == "技能":
-            border_image = self.get_image_without_extension(
-                os.path.join(self.config.general_path, "border1")
-            )
-            border_image = self.adjust_image(
-                border_image, (self.config.border_width, self.config.border_height)
-            )
-            return border_image
-        elif card_info.type == "道具":
-            border_image = self.get_image_without_extension(
-                os.path.join(self.config.general_path, "border3")
-            )
-            border_image = self.adjust_image(
-                border_image, (self.config.border_width, self.config.border_height)
-            )
-            return border_image
+        )
+        border_image = self.adjust_image(
+            border_image, (self.config.border_width, self.config.border_height)
+        )
+        return border_image
 
     def draw_bottom_block(self, base_image, card_info: CardInfo):
         if not self.is_legend(card_info):
