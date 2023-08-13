@@ -209,7 +209,7 @@ class CardMaker:
             return out
 
     def is_legend(self, card_info: CardInfo):
-        if "传说" in card_info.tag or "传奇" in card_info.tag or "秘技" in card_info.tag:
+        if "传说" in card_info.tag or "传奇" in card_info.tag:
             return True
         return False
 
