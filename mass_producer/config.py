@@ -18,6 +18,25 @@ class Config_default(Config):
         self.general_path = os.path.join("resources", "gerneral")  # 通用素材
         self.drawing_path = "drawings"  # 卡牌原画
         self.font_path = os.path.join("resources", "fonts")  # 字体
+        # 元素图片位置
+        self.element_images = {
+            "光": "ele_light",
+            "暗": "ele_dark",
+            "水": "ele_water",
+            "火": "ele_fire",
+            "风": "ele_wind",
+            "地": "ele_earth",
+            "?": "ele_none",
+        }
+        self.element_back = {
+            "光": "back_light",
+            "暗": "back_dark",
+            "水": "back_water",
+            "火": "back_fire",
+            "风": "back_wind",
+            "地": "back_earth",
+            "?": "back_none",
+        }
         # 卡片
         self.card_width = 590
         self.card_height = 860

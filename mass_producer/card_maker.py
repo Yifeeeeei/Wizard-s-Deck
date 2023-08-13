@@ -148,7 +148,7 @@ class CardMaker:
     def get_background(self, card_info: CardInfo):
         bg_image = self.get_image_without_extension(
             os.path.join(
-                self.config.general_path, "back_" + self.translator(card_info.category)
+                self.config.general_path, self.config.element_back[card_info.category]
             )
         )
         bg_image = self.adjust_image(
@@ -299,7 +299,7 @@ class CardMaker:
 
     def get_category_image(self, category: str):
         return self.get_image_without_extension(
-            os.path.join(self.config.general_path, "ele_" + self.translator(category))
+            os.path.join(self.config.general_path, self.config.element_images[category])
         )
 
     def draw_category_and_name(self, card_info: CardInfo, base_image: PIL.Image):
