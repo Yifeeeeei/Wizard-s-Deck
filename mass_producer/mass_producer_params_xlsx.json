@@ -1,14 +1,14 @@
 {
     "生物":{
-        "xlsx_paths":["生物.xlsx"],
+        "xlsx_paths":["sheets/生物.xlsx"],
         "drawing_paths":["drawings"]
     },
     "技能":{
-        "xlsx_paths":["技能.xlsx"],
+        "xlsx_paths":["sheets/技能.xlsx"],
         "drawing_paths":["drawings"]
     },
     "道具":{
-        "xlsx_paths":["道具.xlsx"],
+        "xlsx_paths":["sheets/道具.xlsx"],
         "drawing_paths":["drawings"]
     },
     "overwrite":true,
