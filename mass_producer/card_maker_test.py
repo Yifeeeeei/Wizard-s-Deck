@@ -61,31 +61,35 @@ from config import Config_default
 
 config = Config_default()
 config.general_path = "resources/general"
-config.drawing_path = "."
+config.drawing_path = "drawings"
 cm = CardMaker(config)
 
 ci = CardInfo()
 
-ci.category = "?"
-ci.number = str(101009)
+ci.category = "火"
+ci.number = str(114514)
 ci.type = "生物"
 # ci.duration = 4
-ci.name = "“策无遗算”陈亦非"
-ci.tag = "传奇人类"
-ci.description = "消灭敌方英雄，在敌方英雄生命为0时触发；当你的英雄即将死亡时，恢复所有生命，然后将恢复了所有生命的本卡放回卡组底部"
-
-ci.elements_cost["水"] = 1
-ci.elements_cost["光"] = 1
+ci.name = "田所浩二"
+ci.tag = "传奇野兽"
+ci.description = "消耗：将一个敌方生物邀请至本卡的身边，然后消耗该生物并对其造成1点伤害"
 ci.elements_cost["火"] = 1
-ci.elements_cost["?"] = 1
+ci.elements_cost["水"] = 5
+ci.elements_cost["光"] = 1
+
 ci.elements_cost["地"] = 1
-ci.elements_cost["气"] = 1
-ci.elements_cost["暗"] = 1
+ci.elements_cost["气"] = 4
+ci.elements_cost["暗"] = 4
 
-ci.elements_gain["?"] = 3
+ci.elements_gain["火"] = 9
+ci.elements_gain["光"] = 1
+ci.elements_gain["暗"] = 9
+ci.elements_gain["水"] = 8
+ci.elements_gain["气"] = 10
 
-ci.life = 4
+
+ci.life = 1
 ci.version = "1.0.0"
-ci.quote = "虽然这件事的表面看起来很困难，但只要细心思考就会发现其实它并不简单"
+ci.quote = "(首)"
 card_image = cm.make_card(ci).convert("RGB")
 card_image.save(str(ci.number) + "_" + ci.name + ".jpg")
