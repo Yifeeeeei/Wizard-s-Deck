@@ -61,31 +61,31 @@ from config import Config_default
 
 config = Config_default()
 config.general_path = "resources/general"
-config.drawing_path = "drawings/地"
+config.drawing_path = "."
 cm = CardMaker(config)
 
 ci = CardInfo()
-ci.category = "气"
-ci.number = 114514
+
+ci.category = "?"
+ci.number = str(101009)
 ci.type = "生物"
-ci.duration = 4
-ci.name = "超级水货"
-ci.tag = "传奇道具·大水货"
-ci.description = "持续公开你的手牌，每张大气卡牌使你的大气技能威力+2。衍生：风暴之怒" * 2
-ci.elements_cost["水"] = 2
-ci.elements_cost["光"] = 5
+# ci.duration = 4
+ci.name = "“策无遗算”陈亦非"
+ci.tag = "传奇人类"
+ci.description = "消灭敌方英雄，在敌方英雄生命为0时触发；当你的英雄即将死亡时，恢复所有生命，然后将恢复了所有生命的本卡放回卡组底部"
+
+ci.elements_cost["水"] = 1
+ci.elements_cost["光"] = 1
 ci.elements_cost["火"] = 1
 ci.elements_cost["?"] = 1
-ci.elements_gain["水"] = 2
-ci.elements_gain["光"] = 4
-ci.elements_gain["火"] = 1
-ci.elements_gain["?"] = 1
-ci.elements_expense["水"] = 2
-ci.elements_expense["光"] = 4
-ci.elements_expense["火"] = 1
-ci.elements_expense["?"] = 1
+ci.elements_cost["地"] = 1
+ci.elements_cost["气"] = 1
+ci.elements_cost["暗"] = 1
+
+ci.elements_gain["?"] = 3
+
 ci.life = 4
 ci.version = "1.0.0"
-ci.quote = "我是超级水货！哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"
-card_image = cm.make_card(ci)
-card_image.save("ci.png")
+ci.quote = "虽然这件事的表面看起来很困难，但只要细心思考就会发现其实它并不简单"
+card_image = cm.make_card(ci).convert("RGB")
+card_image.save(str(ci.number) + "_" + ci.name + ".jpg")
