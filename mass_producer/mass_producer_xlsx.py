@@ -17,6 +17,7 @@ class MassProducerXlsx:
         self.card_maker_config.font_path = self.mass_producer_params["font_path"]
         self.all_elements = ["水", "火", "光", "暗", "气", "地", "?"]
         self.blur_elements = ["水", "火", "光", "暗", "气", "地", "?", "无", "？"]
+        self.error_log = []
 
     def make_dir(
         self,
@@ -45,7 +46,7 @@ class MassProducerXlsx:
             return "气"
         if "地" in sentence:
             return "地"
-        if "无" in sentence or "?" or "？" in sentence:
+        if "无" in sentence or "?" in sentence or "？" in sentence:
             return "?"
 
     def dir_ele_translator(self, sentence):
@@ -80,7 +81,9 @@ class MassProducerXlsx:
             card_info.number = "" if pd.isnull(df_row["编号"]) else str(int(df_row["编号"]))
         if "属性" in df_row.keys():
             card_info.category = (
-                "" if pd.isnull(df_row["属性"]) else str(df_row["属性"]).strip()
+                ""
+                if pd.isnull(df_row["属性"])
+                else self.blur_to_accurate(str(df_row["属性"]).strip())
             )
         if "名称" in df_row.keys():
             card_info.name = "" if pd.isnull(df_row["名称"]) else str(df_row["名称"])
@@ -117,13 +120,8 @@ class MassProducerXlsx:
                 else self.element_analysis(df_row["代价"])
             )
         if "版本" in df_row.keys():
-            card_info.description = "" if pd.isnull(df_row["版本"]) else str(df_row["版本"])
-        if (
-            card_info.number == ""
-            or card_info.name == ""
-            or card_info.category == ""
-            or card_info.tag == ""
-        ):
+            card_info.version = "" if pd.isnull(df_row["版本"]) else str(df_row["版本"])
+        if card_info.number == "" or card_info.name == "" or card_info.category == "":
             # 空行
             return None
 
@@ -164,18 +162,21 @@ class MassProducerXlsx:
                 )
 
                 for index, row in tqdm(df.iterrows()):
-                    # print(card_maker.config.drawings_path)
                     try:
                         card_info = self.get_card_info_from_row(row)
                     except Exception as e:
                         print("Error encountered when parsing row: ", row, e)
+                        self.error_log.append(str(row) + " " + str(e))
                         continue
                     if card_info is None:
                         continue
-                    card_maker.config.drawing_path = os.path.join(
-                        current_drawing_path,
-                        self.dir_ele_translator(card_info.category),
-                    )
+                    if self.mass_producer_params["mixedup_elements"] is False:
+                        card_maker.config.drawing_path = os.path.join(
+                            current_drawing_path,
+                            self.dir_ele_translator(card_info.category),
+                        )
+                    else:
+                        card_maker.config.drawing_path = current_drawing_path
                     card_info.type = card_type
 
                     try:
@@ -194,6 +195,7 @@ class MassProducerXlsx:
                         print(
                             "Error encountered when drawing card: ", card_info.name, e
                         )
+                        self.error_log.append(str(card_info) + " " + str(e))
 
     def produce(self):
         # 检查输出路径
@@ -216,3 +218,7 @@ class MassProducerXlsx:
         if "英雄" in self.mass_producer_params.keys():
             # 开始绘制英雄牌
             self.draw_cards("英雄")
+        with open(
+            os.path.join(self.mass_producer_params["output_path"], "error_log.txt"), "w"
+        ) as f:
+            f.write("\n".join(self.error_log))

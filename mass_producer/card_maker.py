@@ -70,19 +70,20 @@ class CardInfo:
 
     def __str__(self):
         s = ""
-        s += "类别" + self.type + "\n"
-        s += "名称" + self.name + "\n"
-        s += "元素" + self.category + "\n"
-        s += "标签" + self.tag + "\n"
-        s += "效果" + self.description + "\n"
-        s += "引言" + self.quote + "\n"
-        s += "费用" + str(self.elements_cost) + "\n"
-        s += "负载" + str(self.elements_gain) + "\n"
-        s += "生命" + str(self.life) + "\n"
-        s += "版本" + str(self.version) + "\n"
-        s += "持续" + str(self.duration) + "\n"
-        s += "威力" + str(self.power) + "\n"
-        s += "代价" + str(self.elements_expense) + "\n"
+        s += "编号 " + str(self.number) + "\n"
+        s += "类别 " + self.type + "\n"
+        s += "名称 " + self.name + "\n"
+        s += "元素 " + self.category + "\n"
+        s += "标签 " + self.tag + "\n"
+        s += "效果 " + self.description + "\n"
+        s += "引言 " + self.quote + "\n"
+        s += "费用 " + str(self.elements_cost) + "\n"
+        s += "负载 " + str(self.elements_gain) + "\n"
+        s += "生命 " + str(self.life) + "\n"
+        s += "版本 " + str(self.version) + "\n"
+        s += "持续 " + str(self.duration) + "\n"
+        s += "威力 " + str(self.power) + "\n"
+        s += "代价 " + str(self.elements_expense) + "\n"
         return s
 
 
@@ -133,7 +134,7 @@ class CardMaker:
         return image
 
     def get_image_without_extension(self, image_name):
-        extension_list = [".png", ".jpg", ".jpeg"]
+        extension_list = [".png", ".jpg", ".jpeg", ".jfif"]
         for ext in extension_list:
             if os.path.exists(image_name + ext):
                 return PIL.Image.open(image_name + ext).convert("RGBA")
